@@ -90,7 +90,7 @@ func ListProjectEnv(projectPath string) ([]string, error) {
 }
 
 func WriteProject(directory, filePath string, file_content []byte) error {
-	if err := os.MkdirAll(directory, 0755); err != nil { // TODO - consider 0700 - rething permissin
+	if err := os.MkdirAll(directory, 0755); err != nil { // TODO - consider 0700 - rething permissions
 		return err
 	}
 

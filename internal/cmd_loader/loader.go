@@ -54,7 +54,7 @@ func Load(env string) error {
 		return fmt.Errorf("error generating json: %w", err)
 	}
 
-	// Todo - load existing prject and merge
+	// Todo - load existing project and merge
 	// - 1 homeDirectory need to figure out .swapenv config -> read from config -> default to ~/.swapenv/projectname
 
 	if err := filehandler.WriteProject(homeDirectory, projectPath, projectJson); err != nil {

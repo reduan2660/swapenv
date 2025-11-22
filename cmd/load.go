@@ -14,8 +14,7 @@ var loadCmd = &cobra.Command{
 	Short: "Loads all the environment files",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		envName := viper.GetString("env")
-		cmd_loader.Load(envName)
-		return nil
+		return cmd_loader.Load(envName)
 	},
 }
 

@@ -17,9 +17,9 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "swapenv",
-	Short: "Switch and sync your environment convinently",
+	Short: "Switch and sync your environment conveniently",
 
-	PersistentPreRunE: func(cmd *cobra.Command, arge []string) error {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		return initializeConfig(cmd)
 	},
 }

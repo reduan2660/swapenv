@@ -3,10 +3,10 @@ package cmd_loader
 import (
 	"bufio"
 	"bytes"
-	"github.com/google/uuid"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/reduan2660/swapenv/internal/types"
 )
 
@@ -25,7 +25,7 @@ func ParseEnv(content []byte) ([]types.EnvValue, error) {
 			spacing++
 		}
 
-		if strings.HasPrefix(line, "#") { // TODO: consider digist, and ?
+		if strings.HasPrefix(line, "#") { // TODO: consider digits, and ?
 			continue
 		}
 
