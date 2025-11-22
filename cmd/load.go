@@ -4,7 +4,7 @@ Copyright © 2025 Alve Reduan <hey@alvereduan.com>
 package cmd
 
 import (
-	"github.com/reduan2660/switchenv/internal/cmd_loader"
+	"github.com/reduan2660/swapenv/internal/cmd_loader"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

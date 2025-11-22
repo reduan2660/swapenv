@@ -8,4 +8,4 @@
 coverage.*
 *.coverprofile
 profile.cov
-switchenv
+swapenv

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/reduan2660/switchenv/internal/cmd_loader"
-	"github.com/reduan2660/switchenv/internal/filehandler"
+	"github.com/reduan2660/swapenv/internal/cmd_loader"
+	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
 func ListEnv() error {

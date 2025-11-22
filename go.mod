@@ -1,4 +1,4 @@
-module github.com/reduan2660/switchenv
+module github.com/reduan2660/swapenv
 
 go 1.24.1
 

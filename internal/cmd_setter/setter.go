@@ -5,9 +5,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/reduan2660/switchenv/internal/cmd_loader"
-	"github.com/reduan2660/switchenv/internal/filehandler"
-	"github.com/reduan2660/switchenv/internal/types"
+	"github.com/reduan2660/swapenv/internal/cmd_loader"
+	"github.com/reduan2660/swapenv/internal/filehandler"
+	"github.com/reduan2660/swapenv/internal/types"
 )
 
 func Set(env string, replace bool) error {

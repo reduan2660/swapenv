@@ -21,7 +21,7 @@ var (
 
 
 var rootCmd = &cobra.Command{
-	Use:   "switchenv",
+	Use:   "swapenv",
 	Short: "Switch and sync your environment convinently",
 
 	PersistentPreRunE: func(cmd *cobra.Command, arge []string) error {
@@ -37,13 +37,13 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/switchenv/default.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/swapenv/default.yaml)")
 }
 
 func initializeConfig(cmd *cobra.Command) error {
 
   // TODO: re-think : do we want to parse flags from envs that will already manage env?
-	// viper.SetEnvPrefix("SWITCHENV") 
+	// viper.SetEnvPrefix("SWAPENV") 
 	// viper.SetEnvKeyReplacer(strings.NewReplacer(".", "*", "-", "*"))
 	// viper.AutomaticEnv()
 	
@@ -55,7 +55,7 @@ func initializeConfig(cmd *cobra.Command) error {
 		cobra.CheckErr(err)
 
 		viper.AddConfigPath(".")
-		viper.AddConfigPath(home + "/.config/switchenv")
+		viper.AddConfigPath(home + "/.config/swapenv")
 		viper.SetConfigName("default")
 		viper.SetConfigType("yaml")
 	}

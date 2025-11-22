@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/reduan2660/switchenv/internal/types"
+	"github.com/reduan2660/swapenv/internal/types"
 )
 
 func ParseEnv(content []byte) ([]types.EnvValue, error) {

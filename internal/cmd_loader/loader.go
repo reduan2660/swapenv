@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/reduan2660/switchenv/internal/filehandler"
-	"github.com/reduan2660/switchenv/internal/types"
+	"github.com/reduan2660/swapenv/internal/filehandler"
+	"github.com/reduan2660/swapenv/internal/types"
 )
 
 func Load(env string) error {
@@ -55,7 +55,7 @@ func Load(env string) error {
 	}
 
 	// Todo - load existing prject and merge
-	// - 1 homeDirectory need to figure out .switchenv config -> read from config -> default to ~/.switchenv/projectname
+	// - 1 homeDirectory need to figure out .swapenv config -> read from config -> default to ~/.swapenv/projectname
 
 	if err := filehandler.WriteProject(homeDirectory, projectPath, projectJson); err != nil {
 		return err
@@ -131,7 +131,7 @@ func GetHomeDirectory(projectName string) (string, error) {
 		return "", err
 	}
 
-	projectPath := filepath.Join(homeDir, ".switchenv", projectName)
+	projectPath := filepath.Join(homeDir, ".swapenv", projectName)
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(projectPath, 0755); err != nil { // TODO: re-thing permission
 			return "", err

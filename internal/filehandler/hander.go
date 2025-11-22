@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/reduan2660/switchenv/internal/types"
+	"github.com/reduan2660/swapenv/internal/types"
 )
 
 func ReadProjectEnv(projectPath, envName string) ([]types.EnvValue, error) {
