@@ -5,6 +5,13 @@ import (
 	"fmt"
 )
 
+type ProjectDir struct {
+	ProjectName string `json:"projectName"`
+	CurrentEnv  string `json:"currentEnv"`
+	LocalPath   string `json:"localPath"`
+	RemotePath  string `json:"remotePath"`
+}
+
 type Project struct {
 	Id             string                `json:"id"`
 	Name           string                `json:"name"`

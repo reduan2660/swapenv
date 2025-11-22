@@ -1,24 +1,19 @@
 /*
 Copyright © 2025 Alve Reduan <hey@alvereduan.com>
-
 */
 package cmd
 
 import (
-	"os"
-	"fmt"
 	"errors"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-
 var (
 	cfgFile string
 )
-
-
 
 var rootCmd = &cobra.Command{
 	Use:   "swapenv",
@@ -42,12 +37,6 @@ func init() {
 
 func initializeConfig(cmd *cobra.Command) error {
 
-  // TODO: re-think : do we want to parse flags from envs that will already manage env?
-	// viper.SetEnvPrefix("SWAPENV") 
-	// viper.SetEnvKeyReplacer(strings.NewReplacer(".", "*", "-", "*"))
-	// viper.AutomaticEnv()
-	
-	// Load The Config File
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
@@ -59,8 +48,7 @@ func initializeConfig(cmd *cobra.Command) error {
 		viper.SetConfigName("default")
 		viper.SetConfigType("yaml")
 	}
-	
-	// Read the Config file
+
 	if err := viper.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
 
@@ -69,12 +57,11 @@ func initializeConfig(cmd *cobra.Command) error {
 		}
 	}
 
-	// Bind cobra flags to viper
 	err := viper.BindPFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Configuration initialized. Using config file:", viper.ConfigFileUsed())
+	// fmt.Println("Configuration initialized. Using config file:", viper.ConfigFileUsed())
 	return nil
 }

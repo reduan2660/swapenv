@@ -70,19 +70,56 @@ func Load(env string) error {
 
 func GetBasicInfo() (projectName, localOwner, localDirectory, homeDirectory, projectPath string, err error) {
 
-	projectName, err = GetProjectName()
+	localDirectory, err = GetCurrentDirectory()
 	if err != nil {
-		return "", "", "", "", "", fmt.Errorf("error getting project name: %w", err)
+		return "", "", "", "", "", fmt.Errorf("error getting local directory: %w", err)
+	}
+
+	existingProject, err := filehandler.FindProjectByLocalPath(localDirectory)
+	if err != nil {
+		return "", "", "", "", "", fmt.Errorf("error checking project map: %w", err)
+	}
+
+	if existingProject != nil {
+		projectName = existingProject.ProjectName
+	} else {
+		projectName, err = GetProjectName()
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error getting project name: %w", err)
+		}
+
+		dirs, err := filehandler.ReadProjectDirs()
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error reading project map: %w", err)
+		}
+
+		nameExists := false
+		for _, dir := range dirs {
+			if dir.ProjectName == projectName {
+				nameExists = true
+				break
+			}
+		}
+
+		if nameExists {
+			parentDir := filepath.Base(filepath.Dir(localDirectory))
+			projectName = parentDir + "/" + projectName
+		}
+
+		newProjectDir := types.ProjectDir{
+			ProjectName: projectName,
+			CurrentEnv:  "",
+			LocalPath:   localDirectory,
+			RemotePath:  "",
+		}
+		if err := filehandler.UpsertProjectDir(newProjectDir); err != nil {
+			return "", "", "", "", "", fmt.Errorf("error adding project to map: %w", err)
+		}
 	}
 
 	localOwner, err = GetLocalOwner()
 	if err != nil {
 		return "", "", "", "", "", fmt.Errorf("error getting local user: %w", err)
-	}
-
-	localDirectory, err = GetCurrentDirectory()
-	if err != nil {
-		return "", "", "", "", "", fmt.Errorf("error getting local directory: %w", err)
 	}
 
 	homeDirectory, err = GetHomeDirectory(projectName)
@@ -96,7 +133,7 @@ func GetBasicInfo() (projectName, localOwner, localDirectory, homeDirectory, pro
 }
 
 func GetProjectName() (string, error) {
-	// TODO : need to consider --project-name, in case of failure need to ask user for input
+
 	currentDirectory, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -124,7 +161,6 @@ func GetCurrentDirectory() (string, error) {
 }
 
 func GetHomeDirectory(projectName string) (string, error) {
-	// TODO: need improvement, need to consider config
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {

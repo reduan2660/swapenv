@@ -11,9 +11,8 @@ import (
 )
 
 func Set(env string, replace bool) error {
-	fmt.Printf("Setting environemnt: %v\n", env)
 
-	_, _, _, _, projectPath, err := cmd_loader.GetBasicInfo()
+	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo()
 	if err != nil {
 		return err
 	}
@@ -53,6 +52,11 @@ func Set(env string, replace bool) error {
 		return fmt.Errorf("error writing .env: %w", err)
 	}
 
+	if err := filehandler.UpdateCurrentEnv(projectName, env); err != nil {
+		return fmt.Errorf("error updating current env: %w", err)
+	}
+
+	fmt.Printf("Swapped environment to: %v\n", env)
 	return nil
 }
 
