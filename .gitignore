@@ -1,0 +1,11 @@
+*.exe
+*.test
+*.out
+*.dll
+/vendor/
+*.env
+.env
+coverage.*
+*.coverprofile
+profile.cov
+switchenv
