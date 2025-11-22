@@ -5,8 +5,11 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
+	"github.com/reduan2660/swapenv/internal/cmd_loader"
+	"github.com/reduan2660/swapenv/internal/filehandler"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -18,6 +21,10 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "swapenv",
 	Short: "Switch and sync your environment conveniently",
+
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return showProjectInfo()
+	},
 
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		return initializeConfig(cmd)
@@ -63,5 +70,29 @@ func initializeConfig(cmd *cobra.Command) error {
 	}
 
 	// fmt.Println("Configuration initialized. Using config file:", viper.ConfigFileUsed())
+	return nil
+}
+
+func showProjectInfo() error {
+	projectName, _, localDirectory, _, _, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
+	if err != nil {
+		return fmt.Errorf("Error: %v\n", err)
+	}
+
+	if projectName == "" {
+		fmt.Printf("no project under current directory, use swapenv load to initiate.")
+		return nil
+	}
+
+	activeEnv, err := filehandler.ReadActiveEnv(localDirectory)
+	if err != nil {
+		return fmt.Errorf("error reading active environment: %w", err)
+	}
+
+	if activeEnv == "" {
+		fmt.Printf("no active environment for %s - to list available environments run swapenv ls", projectName)
+	} else {
+		fmt.Printf("active environment: %s", activeEnv)
+	}
 	return nil
 }

@@ -2,20 +2,19 @@ package cmd_ls
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/reduan2660/swapenv/internal/cmd_loader"
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
 func ListEnv() error {
-	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo()
+	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
 	if err != nil {
 		return err
 	}
 
-	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
-		fmt.Printf("%v project has not been initiated yet\n", projectName)
+	if projectName == "" {
+		fmt.Printf("no project under current directory, use swapenv load to initiate.")
 		return nil
 	}
 
@@ -24,8 +23,9 @@ func ListEnv() error {
 		return fmt.Errorf("error reading project file: %w", err)
 	}
 
+	fmt.Printf("available environments:")
 	for _, en := range envNames {
-		fmt.Println(en)
+		fmt.Printf(" %s", en)
 	}
 
 	return nil

@@ -61,6 +61,16 @@ func FindProjectByLocalPath(localPath string) (*types.ProjectDir, error) {
 	return nil, nil
 }
 
+func ReadActiveEnv(localPath string) (string, error) {
+	projectDir, err := FindProjectByLocalPath(localPath)
+	if err != nil {
+		return "", err
+	}
+
+	return projectDir.CurrentEnv, nil
+
+}
+
 func WriteProjectDirs(dirs []types.ProjectDir) error {
 	mapPath, err := GetMapFilePath()
 	if err != nil {

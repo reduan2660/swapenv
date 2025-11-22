@@ -12,13 +12,10 @@ import (
 
 func Set(env string, replace bool) error {
 
-	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo()
+	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
 		return err
 	}
-
-	// TODO: try to validate information like if localDirectory matches
-	// fmt.Printf("%v %v %v %v", projectName, localOwner, localDirectory, homeDirectory)
 
 	incomingEnvValues, err := filehandler.ReadProjectEnv(projectPath, env)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 
 func Load(env string) error {
 
-	projectName, localOwner, localDirectory, homeDirectory, projectPath, err := GetBasicInfo()
+	projectName, localOwner, localDirectory, homeDirectory, projectPath, err := GetBasicInfo(GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
 		return err
 	}
@@ -26,6 +26,7 @@ func Load(env string) error {
 	}
 
 	if len(files) == 0 {
+		fmt.Print("no environment to load")
 		return nil
 	}
 
@@ -65,10 +66,19 @@ func Load(env string) error {
 		return err
 	}
 
+	fmt.Print("loaded environment:")
+	for envName := range envs {
+		fmt.Printf(" %s", envName)
+	}
+
 	return nil
 }
 
-func GetBasicInfo() (projectName, localOwner, localDirectory, homeDirectory, projectPath string, err error) {
+type GetBasicInfoOptions struct {
+	ReadOnly bool
+}
+
+func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirectory, homeDirectory, projectPath string, err error) {
 
 	localDirectory, err = GetCurrentDirectory()
 	if err != nil {
@@ -82,7 +92,8 @@ func GetBasicInfo() (projectName, localOwner, localDirectory, homeDirectory, pro
 
 	if existingProject != nil {
 		projectName = existingProject.ProjectName
-	} else {
+	} else if !opts.ReadOnly {
+
 		projectName, err = GetProjectName()
 		if err != nil {
 			return "", "", "", "", "", fmt.Errorf("error getting project name: %w", err)
@@ -115,20 +126,21 @@ func GetBasicInfo() (projectName, localOwner, localDirectory, homeDirectory, pro
 		if err := filehandler.UpsertProjectDir(newProjectDir); err != nil {
 			return "", "", "", "", "", fmt.Errorf("error adding project to map: %w", err)
 		}
+
 	}
 
 	localOwner, err = GetLocalOwner()
 	if err != nil {
 		return "", "", "", "", "", fmt.Errorf("error getting local user: %w", err)
 	}
+	if projectName != "" {
+		homeDirectory, err = GetHomeDirectory(projectName)
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error getting home directory: %w", err)
+		}
 
-	homeDirectory, err = GetHomeDirectory(projectName)
-	if err != nil {
-		return "", "", "", "", "", fmt.Errorf("error getting home directory: %w", err)
+		projectPath = filepath.Join(homeDirectory, "project.json")
 	}
-
-	projectPath = filepath.Join(homeDirectory, "project.json")
-
 	return
 }
 
