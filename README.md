@@ -1,6 +1,6 @@
 # swapenv
 
-Swap environment with breeze.
+swap environment with breeze.
 
 ## Quick Start
 
