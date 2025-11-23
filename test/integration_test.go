@@ -285,3 +285,67 @@ func containsMiddle(s, substr string) bool {
 	}
 	return false
 }
+
+func TestSpit(t *testing.T) {
+	cleanup := setupTestEnv(t)
+	defer cleanup()
+
+	devEnvContent := `ENV_1=dev
+
+
+ENV_2=dev`
+	createEnvFile(t, ".dev.env", devEnvContent)
+
+	prodEnvContent := `ENV_1=prod
+
+ENV_4=prod`
+	createEnvFile(t, ".prod.env", prodEnvContent)
+
+	loadCmd := cmd.GetLoadCmd()
+	loadCmd.Flags().Set("env", "*")
+	loadCmd.Flags().Set("replace", "false")
+	if err := loadCmd.RunE(loadCmd, []string{}); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := os.Stat(".dev.env"); !os.IsNotExist(err) {
+		t.Error(".dev.env should be deleted after load")
+	}
+
+	spitCmd := cmd.GetSpitCmd()
+	spitCmd.Flags().Set("env", "*")
+	if err := spitCmd.RunE(spitCmd, []string{}); err != nil {
+		t.Fatalf("spit failed: %v", err)
+	}
+
+	if _, err := os.Stat(".dev.env"); os.IsNotExist(err) {
+		t.Error(".dev.env should exist after spit")
+	}
+	if _, err := os.Stat(".prod.env"); os.IsNotExist(err) {
+		t.Error(".prod.env should exist after spit")
+	}
+
+	devContent, err := os.ReadFile(".dev.env")
+	if err != nil {
+		t.Fatal(err)
+	}
+	devStr := string(devContent)
+	if !contains(devStr, "ENV_1=dev") {
+		t.Error("ENV_1=dev should be in .dev.env")
+	}
+	if !contains(devStr, "ENV_2=dev") {
+		t.Error("ENV_2=dev should be in .dev.env")
+	}
+
+	prodContent, err := os.ReadFile(".prod.env")
+	if err != nil {
+		t.Fatal(err)
+	}
+	prodStr := string(prodContent)
+	if !contains(prodStr, "ENV_1=prod") {
+		t.Error("ENV_1=prod should be in .prod.env")
+	}
+	if !contains(prodStr, "ENV_4=prod") {
+		t.Error("ENV_4=prod should be in .prod.env")
+	}
+}
