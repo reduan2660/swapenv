@@ -7,20 +7,56 @@ import (
 	"path/filepath"
 
 	"github.com/reduan2660/swapenv/internal/types"
+	"github.com/spf13/viper"
 )
 
-func GetMapFilePath() (string, error) {
+func GetBaseDir() (string, error) {
+	customHome := viper.GetString("home_directory")
+	if customHome != "" {
+		if err := os.MkdirAll(customHome, 0755); err != nil {
+			return "", fmt.Errorf("failed to create custom home directory: %w", err)
+		}
+		return customHome, nil
+	}
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
 
-	swapenvDir := filepath.Join(homeDir, ".swapenv")
-	if err := os.MkdirAll(swapenvDir, 0755); err != nil {
+	baseDir := filepath.Join(homeDir, ".swapenv")
+	if err := os.MkdirAll(baseDir, 0755); err != nil {
 		return "", err
 	}
 
-	return filepath.Join(swapenvDir, "map.json"), nil
+	return baseDir, nil
+
+}
+
+func GetHomeDirectory(projectName string) (string, error) {
+
+	homeDir, err := GetBaseDir()
+	if err != nil {
+		return "", err
+	}
+
+	projectPath := filepath.Join(homeDir, projectName)
+	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(projectPath, 0755); err != nil {
+			return "", err
+		}
+	}
+
+	return projectPath, nil
+}
+
+func GetMapFilePath() (string, error) {
+	homeDir, err := GetBaseDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(homeDir, "map.json"), nil
 }
 
 func ReadProjectDirs() ([]types.ProjectDir, error) {
