@@ -10,6 +10,7 @@ swap environment with breeze.
 - `swapenv to <environment-name>` to swap environments. e.g.: `swapenv to dev`
 - `swapenv ls` to list all the available environments
 - `swapenv` to show project staus or current active environment if any
+- `swapenv spit` to write all the environment back to .*.env files (use --env to specify a single environment)
 
 ## Whats coming
 - Sharing, and cloud sync
