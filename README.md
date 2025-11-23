@@ -17,3 +17,6 @@ swap environment with breeze.
 
 ## Author
 Alve Reduan - [hey@alvereduan.com](mailto:hey@alvereduan.com)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
