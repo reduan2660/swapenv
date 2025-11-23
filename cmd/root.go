@@ -42,6 +42,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/swapenv/default.yaml)")
 }
 
+func GetRootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func initializeConfig(cmd *cobra.Command) error {
 
 	if cfgFile != "" {

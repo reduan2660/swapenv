@@ -13,6 +13,9 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Loads all the environment files",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+			return err
+		}
 		envName := viper.GetString("env")
 		replace := viper.GetBool("replace")
 		return cmd_loader.Load(envName, replace)
@@ -23,4 +26,8 @@ func init() {
 	rootCmd.AddCommand(loadCmd)
 	loadCmd.Flags().String("env", "*", "Specific environment to load")
 	loadCmd.Flags().Bool("replace", false, "Replace existing instead of fast forwarding")
+}
+
+func GetLoadCmd() *cobra.Command {
+	return loadCmd
 }

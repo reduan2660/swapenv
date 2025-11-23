@@ -19,3 +19,7 @@ var lsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(lsCmd)
 }
+
+func GetLsCmd() *cobra.Command {
+	return lsCmd
+}

@@ -7,6 +7,7 @@ repos:
       - id: go-imports
       - id: go-mod-tidy
       - id: golangci-lint-repo-mod
+      - id: go-test-repo-mod
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

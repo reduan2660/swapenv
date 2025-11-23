@@ -14,6 +14,9 @@ var toCmd = &cobra.Command{
 	Short: "Sets an environment for this project",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+			return err
+		}
 		envName := args[0]
 		replace := viper.GetBool("replace")
 		return cmd_setter.Set(envName, replace)
@@ -23,4 +26,8 @@ var toCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(toCmd)
 	toCmd.Flags().Bool("replace", false, "to replace the existing .env instead of overwriting")
+}
+
+func GetToCmd() *cobra.Command {
+	return toCmd
 }

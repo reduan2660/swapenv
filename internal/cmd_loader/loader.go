@@ -17,8 +17,6 @@ func Load(env string, replace bool) error {
 		return err
 	}
 
-	fmt.Printf("%s %s %s %s %s\n", projectName, localOwner, localDirectory, homeDirectory, projectPath)
-
 	filename := "." + env + ".env"
 
 	files, err := filepath.Glob(filename)
