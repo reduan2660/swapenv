@@ -11,7 +11,7 @@ import (
 	"github.com/reduan2660/swapenv/internal/types"
 )
 
-func Load(env string) error {
+func Load(env string, replace bool) error {
 
 	projectName, localOwner, localDirectory, homeDirectory, projectPath, err := GetBasicInfo(GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
@@ -48,15 +48,23 @@ func Load(env string) error {
 		envs[envName] = envValues
 	}
 
+	fmt.Printf("replace %v\n", replace)
+
+	if !replace {
+		for envName := range envs {
+			existingEnvValues, err := filehandler.ReadProjectEnv(projectPath, envName)
+			if err == nil {
+				envs[envName] = MergeEnv(envs[envName], existingEnvValues, false)
+			}
+		}
+	}
+
 	newProject := MarshalProject(projectName, localOwner, localDirectory, envs)
 
 	projectJson, err := newProject.MarshalJSON()
 	if err != nil {
 		return fmt.Errorf("error generating json: %w", err)
 	}
-
-	// Todo - load existing project and merge
-	// - 1 homeDirectory need to figure out .swapenv config -> read from config -> default to ~/.swapenv/projectname
 
 	if err := filehandler.WriteProject(homeDirectory, projectPath, projectJson); err != nil {
 		return err

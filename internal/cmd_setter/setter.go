@@ -7,7 +7,6 @@ import (
 
 	"github.com/reduan2660/swapenv/internal/cmd_loader"
 	"github.com/reduan2660/swapenv/internal/filehandler"
-	"github.com/reduan2660/swapenv/internal/types"
 )
 
 func Set(env string, replace bool) error {
@@ -44,7 +43,7 @@ func Set(env string, replace bool) error {
 		return fmt.Errorf("error parsing .env: %w", err)
 	}
 
-	mergedEnv := mergeEnv(incomingEnvValues, curEnvValues, replace)
+	mergedEnv := cmd_loader.MergeEnv(incomingEnvValues, curEnvValues, replace)
 	if err := filehandler.WriteEnv(mergedEnv, envFilePath); err != nil {
 		return fmt.Errorf("error writing .env: %w", err)
 	}
@@ -55,39 +54,4 @@ func Set(env string, replace bool) error {
 
 	fmt.Printf("Swapped environment to: %v\n", env)
 	return nil
-}
-
-func mergeEnv(incoming, current []types.EnvValue, replace bool) []types.EnvValue {
-
-	if replace {
-		return incoming
-	}
-
-	incomingMap := make(map[string]types.EnvValue)
-	for _, ev := range incoming {
-		incomingMap[ev.Key] = ev
-	}
-
-	marked := make(map[string]bool)
-	merged := make([]types.EnvValue, 0)
-
-	for _, ev := range current {
-		if incomingVal, exists := incomingMap[ev.Key]; exists { // overwrite if exists
-			incomingVal.Order = ev.Order
-
-			merged = append(merged, incomingVal)
-			marked[ev.Key] = true
-		} else {
-			merged = append(merged, ev)
-		}
-	}
-
-	for idx, ev := range incoming {
-		if !marked[ev.Key] {
-			ev.Order = len(current) + idx
-			merged = append(merged, ev)
-		}
-	}
-
-	return merged
 }

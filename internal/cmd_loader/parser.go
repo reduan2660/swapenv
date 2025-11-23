@@ -62,6 +62,41 @@ func ParseEnv(content []byte) ([]types.EnvValue, error) {
 	return envValues, nil
 }
 
+func MergeEnv(incoming, current []types.EnvValue, replace bool) []types.EnvValue {
+
+	if replace {
+		return incoming
+	}
+
+	incomingMap := make(map[string]types.EnvValue)
+	for _, ev := range incoming {
+		incomingMap[ev.Key] = ev
+	}
+
+	marked := make(map[string]bool)
+	merged := make([]types.EnvValue, 0)
+
+	for _, ev := range current {
+		if incomingVal, exists := incomingMap[ev.Key]; exists { // overwrite if exists
+			incomingVal.Order = ev.Order
+
+			merged = append(merged, incomingVal)
+			marked[ev.Key] = true
+		} else {
+			merged = append(merged, ev)
+		}
+	}
+
+	for idx, ev := range incoming {
+		if !marked[ev.Key] {
+			ev.Order = len(current) + idx
+			merged = append(merged, ev)
+		}
+	}
+
+	return merged
+}
+
 func MarshalProject(projectName, owner, localDirectory string, envs map[string][]types.EnvValue) types.Project {
 
 	now := time.Now().UTC().Unix()
