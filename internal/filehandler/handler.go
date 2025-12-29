@@ -37,7 +37,7 @@ func ReadProjectEnv(projectPath, envName string) ([]types.EnvValue, error) {
 
 	envData, exists := inner[envName]
 	if !exists {
-		return nil, fmt.Errorf("environmetn '%s' not found in project", envName)
+		return nil, fmt.Errorf("environment '%s' not found in project", envName)
 	}
 
 	var envValues []types.EnvValue
