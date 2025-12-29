@@ -9,7 +9,7 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func Set(env string, replace bool) error {
+func Set(env string, replace bool, skipCommon bool) error {
 
 	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
@@ -24,6 +24,24 @@ func Set(env string, replace bool) error {
 	sort.Slice(incomingEnvValues, func(i, j int) bool {
 		return incomingEnvValues[i].Order < incomingEnvValues[j].Order
 	})
+
+	if env == "common" {
+		// TODO: define behaviour
+		return fmt.Errorf("setting to common isnt allowed")
+	}
+
+	if !skipCommon {
+		commonEnvValues, err := filehandler.ReadProjectEnv(projectPath, "common")
+
+		if err == nil {
+			sort.Slice(commonEnvValues, func(i, j int) bool {
+				return commonEnvValues[i].Order < commonEnvValues[j].Order
+			})
+
+			// merge incoming with common, with priority given to incoming
+			incomingEnvValues = cmd_loader.MergeEnv(incomingEnvValues, commonEnvValues, false)
+		}
+	}
 
 	envFilePath := ".env" // TODO: consider parent
 

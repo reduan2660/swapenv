@@ -19,13 +19,15 @@ var toCmd = &cobra.Command{
 		}
 		envName := args[0]
 		replace := viper.GetBool("replace")
-		return cmd_setter.Set(envName, replace)
+		skipCommon := viper.GetBool("skip-common")
+		return cmd_setter.Set(envName, replace, skipCommon)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(toCmd)
 	toCmd.Flags().Bool("replace", false, "to replace the existing .env instead of overwriting")
+	toCmd.Flags().Bool("skip-common", false, "dont append common env variables (if exists)")
 }
 
 func GetToCmd() *cobra.Command {
