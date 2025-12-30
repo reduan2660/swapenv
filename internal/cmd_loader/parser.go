@@ -62,9 +62,22 @@ func ParseEnv(content []byte) ([]types.EnvValue, error) {
 	return envValues, nil
 }
 
-func MergeEnv(incoming, current []types.EnvValue, replace bool) []types.EnvValue {
+type MergeEnvConfig struct {
+	Replace          bool   // if true, just return incoming (ignore current)
+	ConflictPriority string // "incoming" or "current" - which value wins for matching keys
+}
 
-	if replace {
+// MergeEnv merges incoming and current environment values.
+//
+// Order: current's keys come first (in current's order), then incoming-only keys are appended.
+// Conflict resolution: when a key exists in both, ConflictPriority determines which value wins:
+//   - "incoming": use incoming's value
+//   - "current": use current's value
+//
+// If Replace=true, just return incoming (ignore current entirely).
+func MergeEnv(incoming, current []types.EnvValue, config MergeEnvConfig) []types.EnvValue {
+
+	if config.Replace {
 		return incoming
 	}
 
@@ -77,11 +90,16 @@ func MergeEnv(incoming, current []types.EnvValue, replace bool) []types.EnvValue
 	merged := make([]types.EnvValue, 0)
 
 	for _, ev := range current {
-		if incomingVal, exists := incomingMap[ev.Key]; exists { // overwrite if exists
-			incomingVal.Order = ev.Order
-
-			merged = append(merged, incomingVal)
+		if incomingVal, exists := incomingMap[ev.Key]; exists {
 			marked[ev.Key] = true
+
+			if config.ConflictPriority == "incoming" {
+				incomingVal.Order = ev.Order
+				merged = append(merged, incomingVal)
+			} else {
+				// "current" or default: current's value wins
+				merged = append(merged, ev)
+			}
 		} else {
 			merged = append(merged, ev)
 		}

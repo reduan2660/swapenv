@@ -3,6 +3,7 @@ package test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/reduan2660/swapenv/cmd"
@@ -337,6 +338,18 @@ DATABASE_URL=dev_db`
 	// When key exists in both, target env (dev) overrides common
 	if !contains(contentStr, "DATABASE_URL=dev_db") {
 		t.Error("DATABASE_URL=dev_db should be in .env (dev overrides common)")
+	}
+
+	// Verify ordering: dev's variables should come before common-only variables
+	env1Pos := strings.Index(contentStr, "ENV_1=dev")
+	dbPos := strings.Index(contentStr, "DATABASE_URL=dev_db")
+	sharedPos := strings.Index(contentStr, "SHARED_VAR=common")
+
+	if sharedPos < env1Pos {
+		t.Error("SHARED_VAR (common-only) should appear after ENV_1 (dev)")
+	}
+	if sharedPos < dbPos {
+		t.Error("SHARED_VAR (common-only) should appear after DATABASE_URL (dev)")
 	}
 }
 
