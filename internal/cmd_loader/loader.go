@@ -51,7 +51,9 @@ func Load(env string, replace bool) error {
 		for envName := range envs {
 			existingEnvValues, err := filehandler.ReadProjectEnv(projectPath, envName)
 			if err == nil {
-				envs[envName] = MergeEnv(envs[envName], existingEnvValues, false)
+				envs[envName] = MergeEnv(envs[envName], existingEnvValues, MergeEnvConfig{
+				ConflictPriority: "incoming",
+			})
 			}
 		}
 	}

@@ -38,8 +38,10 @@ func Set(env string, replace bool, skipCommon bool) error {
 				return commonEnvValues[i].Order < commonEnvValues[j].Order
 			})
 
-			// merge incoming with common, with priority given to incoming
-			incomingEnvValues = cmd_loader.MergeEnv(incomingEnvValues, commonEnvValues, false)
+			// merge incoming (dev) with common: dev order first, dev values win for conflicts
+			incomingEnvValues = cmd_loader.MergeEnv(commonEnvValues, incomingEnvValues, cmd_loader.MergeEnvConfig{
+				ConflictPriority: "current",
+			})
 		}
 	}
 
@@ -61,7 +63,10 @@ func Set(env string, replace bool, skipCommon bool) error {
 		return fmt.Errorf("error parsing .env: %w", err)
 	}
 
-	mergedEnv := cmd_loader.MergeEnv(incomingEnvValues, curEnvValues, replace)
+	mergedEnv := cmd_loader.MergeEnv(incomingEnvValues, curEnvValues, cmd_loader.MergeEnvConfig{
+		Replace:          replace,
+		ConflictPriority: "incoming",
+	})
 	if err := filehandler.WriteEnv(mergedEnv, envFilePath); err != nil {
 		return fmt.Errorf("error writing .env: %w", err)
 	}
