@@ -9,20 +9,25 @@ import (
 var shareCmd = &cobra.Command{
 	Use:   "share",
 	Short: "Share environment",
-	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := viper.BindPFlags(cmd.Flags()); err != nil {
 			return err
 		}
+
 		serverURL := viper.GetString("server")
-		envName := args[0]
-		return cmd_share.Share(serverURL, envName)
+		projectName := viper.GetString("project")
+		envName := viper.GetString("env")
+		version := viper.GetString("version")
+
+		return cmd_share.Share(serverURL, projectName, envName, version)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(shareCmd)
-	shareCmd.Flags().String("server", "https://swapenv.sh", "swapenv server URL")
+	shareCmd.Flags().String("project", "", "project to share (default: current directory)")
+	shareCmd.Flags().String("env", "", "specific environment to share (default: all)")
+	shareCmd.Flags().String("version", "latest", "version to share")
 }
 
 func GetShareCmd() *cobra.Command {

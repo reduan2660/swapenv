@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/reduan2660/swapenv/internal/api"
 	"github.com/reduan2660/swapenv/internal/cmd_loader"
@@ -11,6 +12,7 @@ import (
 	"github.com/reduan2660/swapenv/internal/cmd_logout"
 	"github.com/reduan2660/swapenv/internal/crypto"
 	"github.com/reduan2660/swapenv/internal/filehandler"
+	"github.com/reduan2660/swapenv/internal/types"
 )
 
 type wsMessage struct {
@@ -19,9 +21,9 @@ type wsMessage struct {
 	Message string `json:"message,omitempty"`
 }
 
-func Share(serverURL, envName string) error {
+func Share(serverURL, projectName, envName, versionStr string) error {
 	if !api.IsLoggedIn() {
-		fmt.Println("Not logged in. Starting login flow...")
+		fmt.Println("Not logged in. Logging in...")
 		if err := cmd_login.Login(serverURL); err != nil {
 			return err
 		}
@@ -32,17 +34,62 @@ func Share(serverURL, envName string) error {
 		cmd_logout.Logout()
 		return fmt.Errorf("failed to load credentials: %w. we've logged you out, try loggin in again", err)
 	}
-	_, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
+
+	if projectName == "" {
+		name, _, _, _, _, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
+		if err != nil {
+			return err
+		}
+		if name == "" {
+			return fmt.Errorf("no project in current directory, use --project to specify")
+		}
+		projectName = name
+	}
+
+	project, err := filehandler.FindProjectByName(projectName)
+	if err != nil {
+		return fmt.Errorf("error finding project: %w", err)
+	}
+	if project == nil {
+		return fmt.Errorf("project '%s' not found", projectName)
+	}
+
+	version, err := filehandler.ResolveVersion(projectName, versionStr)
 	if err != nil {
 		return err
 	}
 
-	envValues, err := filehandler.ReadProjectEnv(projectPath, envName)
+	projectPath, err := filehandler.GetVersionFilePath(projectName, version)
 	if err != nil {
-		return fmt.Errorf("failed to read env '%s': %w", envName, err)
+		return err
 	}
 
-	envData, err := json.Marshal(envValues)
+	envNames, err := filehandler.ListProjectEnv(projectPath)
+	if err != nil {
+		return fmt.Errorf("failed to list environments: %w", err)
+	}
+
+	if len(envNames) == 0 {
+		return fmt.Errorf("no environments found in project")
+	}
+
+	if envName != "" {
+		if !slices.Contains(envNames, envName) {
+			return fmt.Errorf("environment '%s' not found, available: %v", envName, envNames)
+		}
+		envNames = []string{envName}
+	}
+
+	envMap := make(map[string][]types.EnvValue)
+	for _, name := range envNames {
+		envValues, err := filehandler.ReadProjectEnv(projectPath, name)
+		if err != nil {
+			return fmt.Errorf("failed to read env '%s': %w", name, err)
+		}
+		envMap[name] = envValues
+	}
+
+	envData, err := json.Marshal(envMap)
 	if err != nil {
 		return err
 	}
@@ -63,6 +110,7 @@ func Share(serverURL, envName string) error {
 	}
 
 	fmt.Printf("Session stream: %s\n", msg.Code)
+	fmt.Printf("Sharing: %s (v%d) - envs: %v\n", projectName, version, envNames)
 	fmt.Println("Waiting for receiver...")
 
 	for {
@@ -72,7 +120,6 @@ func Share(serverURL, envName string) error {
 
 		switch msg.Type {
 		case "ready":
-			// read receiver's public key
 			_, pubKeyBytes, err := conn.ReadMessage()
 			if err != nil {
 				return err
@@ -88,9 +135,12 @@ func Share(serverURL, envName string) error {
 				return fmt.Errorf("encryption failed: %w", err)
 			}
 
-			// send encrypted payload
-			payload := base64.StdEncoding.EncodeToString(encrypted)
-			if err := conn.WriteMessage(1, []byte(payload)); err != nil {
+			nameBytes := []byte(projectName)
+			payload := append([]byte{byte(len(nameBytes))}, nameBytes...)
+			payload = append(payload, encrypted...)
+
+			encoded := base64.StdEncoding.EncodeToString(payload)
+			if err := conn.WriteMessage(1, []byte(encoded)); err != nil {
 				return err
 			}
 

@@ -32,11 +32,39 @@ Under the hood, swapenv maintains a versioning, whenever we're loading / receivi
   Config:
   - max_versions: 5 - how many versions to keep (default 5)
 
-## Whats coming
-- Sharing, and cloud sync
+## share/receive
 
-## Author
-Alve Reduan - [hey@alvereduan.com](mailto:hey@alvereduan.com)
+e2e encyprted share and sync. the server only carries receiver's public key and encyprted payload.
 
-## License
+
+### Commands
+- `swapenv share` - share current project (all envs, latest version)
+  - `--project` - specific project
+  - `--env` - specific env only
+  - `--version` - specific version (default: latest)
+
+- `swapenv receive` - receive shared environment
+  - existing project → new version
+  - new project → created (no localPath)
+
+- `swapenv map <project>` - assign current directory to project
+
+### Flow
+1. Device A: `swapenv share` → stream code shown
+2. Device B: `swapenv receive` → receives & saves
+3. Device B: `swapenv map myproject` → links to directory
+4. Device B: `swapenv to dev` → activates env
+
+### Server
+- Default: `app.swapenv.sh`
+- Self-host: github.com/reduan2660/swapenv-server
+- Override: `--server <url>` or set `server` in config
+
+## whats coming
+- cloud sync
+
+## author
+alve reduan - [iam.reduan@gmail.com](mailto:iam.reduan@gmail.com)
+
+## license
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
