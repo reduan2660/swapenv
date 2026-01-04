@@ -109,7 +109,14 @@ func ResolveVersion(projectName, versionStr string) (int, error) {
 
 	// "latest" = latest version
 	if versionStr == "latest" {
-		return dir.LatestVersion, nil
+		if dir.LatestVersion > 0 {
+			return dir.LatestVersion, nil
+		}
+		// Fallback to current version
+		if dir.CurrentVersion > 0 {
+			return dir.CurrentVersion, nil
+		}
+		return 0, fmt.Errorf("no version found for project: %s", projectName)
 	}
 
 	// Try as number first
