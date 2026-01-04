@@ -2,7 +2,7 @@
 
 swap environment with breeze.
 
-## Quick Start
+## quick start
 
 - install `go install github.com/reduan2660/swapenv@latest` (binary coming soon)
 - specify the environment in `.dev.env`, `.stage.env`, ...
@@ -12,10 +12,10 @@ swap environment with breeze.
 - `swapenv` to show project staus or current active environment if any
 - `swapenv spit` to write all the environment back to .*.env files (use --env to specify a single environment)
 
-Under the hood, swapenv maintains a versioning, whenever we're loading / receiving new environment it increments the version. we can rename, select, rollback the vesions.
-  - Each load creates a new version
-  - Old versions auto-pruned (keeps latest N)
-  - Named versions are protected from pruning
+under the hood, swapenv maintains a versioning, whenever we're loading / receiving new environment it increments the version. we can rename, select, rollback the vesions.
+  - each load creates a new version
+  - old versions auto-pruned (keeps latest N)
+  - named versions are protected from pruning
 
   - `swapenv version` - show current & latest version
   - `swapenv version <n>` - switch to version n
@@ -49,16 +49,16 @@ e2e encyprted share and sync. the server only carries receiver's public key and 
 
 - `swapenv map <project>` - assign current directory to project
 
-### Flow
-1. Device A: `swapenv share` → stream code shown
-2. Device B: `swapenv receive` → receives & saves
-3. Device B: `swapenv map myproject` → links to directory
-4. Device B: `swapenv to dev` → activates env
+### flow
+1. device A: `swapenv share` → stream code shown
+2. device B: `swapenv receive` → receives & saves
+3. device B: `swapenv map myproject` → links to directory
+4. device B: `swapenv to dev` → activates env
 
-### Server
-- Default: `app.swapenv.sh`
-- Self-host: github.com/reduan2660/swapenv-server
-- Override: `--server <url>` or set `server` in config
+### server
+- default: `app.swapenv.sh`
+- self-host: github.com/reduan2660/swapenv-server
+- override: `--server <url>` or set `server` in config
 
 ## whats coming
 - cloud sync
@@ -67,4 +67,4 @@ e2e encyprted share and sync. the server only carries receiver's public key and 
 alve reduan - [iam.reduan@gmail.com](mailto:iam.reduan@gmail.com)
 
 ## license
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+this project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
