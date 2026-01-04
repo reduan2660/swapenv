@@ -20,7 +20,7 @@ var loginCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(loginCmd)
-	loginCmd.Flags().String("server", "https://swapenv.sh", "swapenv server URL")
+	loginCmd.Flags().String("server", viper.GetString("server"), "swapenv server URL")
 }
 
 func GetLoginCmd() *cobra.Command {

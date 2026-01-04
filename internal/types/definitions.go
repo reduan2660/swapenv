@@ -7,9 +7,13 @@ import (
 
 type ProjectDir struct {
 	ProjectName string `json:"projectName"`
-	CurrentEnv  string `json:"currentEnv"`
 	LocalPath   string `json:"localPath"`
 	RemotePath  string `json:"remotePath"`
+
+	CurrentEnv     string            `json:"currentEnv"`
+	CurrentVersion int               `json:"CurrentVersion"`
+	LatestVersion  int               `json:"latestVersion"`
+	VersionNames   map[string]string `json:"versionNames,omitempty"`
 }
 
 type Project struct {
