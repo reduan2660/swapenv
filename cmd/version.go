@@ -58,4 +58,21 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	versionCmd.AddCommand(versionLsCmd)
 	versionCmd.AddCommand(versionRenameCmd)
+	versionCmd.AddCommand(versionRollbackCmd)
+}
+
+func GetVersionCmd() *cobra.Command {
+	return versionCmd
+}
+
+func GetVersionLsCmd() *cobra.Command {
+	return versionLsCmd
+}
+
+func GetVersionRenameCmd() *cobra.Command {
+	return versionRenameCmd
+}
+
+func GetVersionRollbackCmd() *cobra.Command {
+	return versionRollbackCmd
 }

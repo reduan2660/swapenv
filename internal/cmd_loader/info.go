@@ -70,6 +70,11 @@ func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirec
 			return "", "", "", "", "", fmt.Errorf("error adding project to map: %w", err)
 		}
 
+		existingProject, err = filehandler.FindProjectByLocalPath(localDirectory)
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error fetching new project: %w", err)
+		}
+
 	}
 
 	localOwner, err = GetLocalOwner()
@@ -81,6 +86,8 @@ func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirec
 		if err != nil {
 			return "", "", "", "", "", fmt.Errorf("error getting home directory: %w", err)
 		}
+
+		existingProject, _ = filehandler.FindProjectByLocalPath(localDirectory) // Re-fetch after potential migration
 
 		version := existingProject.CurrentVersion
 		if version == 0 {
