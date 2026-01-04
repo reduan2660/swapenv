@@ -8,7 +8,7 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func Spit(envPattern string) error {
+func Spit(envPattern, versionStr string) error {
 	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
 	if err != nil {
 		return err
@@ -17,6 +17,17 @@ func Spit(envPattern string) error {
 	if projectName == "" {
 		fmt.Printf("no project under current directory, use swapenv load to initiate.")
 		return nil
+	}
+
+	if versionStr != "" {
+		version, err := filehandler.ResolveVersion(projectName, versionStr)
+		if err != nil {
+			return err
+		}
+		projectPath, err = filehandler.GetVersionFilePath(projectName, version)
+		if err != nil {
+			return err
+		}
 	}
 
 	envNames, err := filehandler.ListProjectEnv(projectPath)

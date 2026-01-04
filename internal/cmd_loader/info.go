@@ -28,6 +28,10 @@ func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirec
 
 	if existingProject != nil {
 		projectName = existingProject.ProjectName
+
+		if err := filehandler.MigrateProjectIfNeeded(projectName); err != nil {
+			return "", "", "", "", "", fmt.Errorf("error migrating project: %w", err)
+		}
 	} else if !opts.ReadOnly {
 
 		projectName, err = GetProjectName()
@@ -54,13 +58,21 @@ func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirec
 		}
 
 		newProjectDir := types.ProjectDir{
-			ProjectName: projectName,
-			CurrentEnv:  "",
-			LocalPath:   localDirectory,
-			RemotePath:  "",
+			ProjectName:    projectName,
+			CurrentEnv:     "",
+			LocalPath:      localDirectory,
+			RemotePath:     "",
+			CurrentVersion: 0,
+			LatestVersion:  0,
+			VersionNames:   make(map[string]string),
 		}
 		if err := filehandler.UpsertProjectDir(newProjectDir); err != nil {
 			return "", "", "", "", "", fmt.Errorf("error adding project to map: %w", err)
+		}
+
+		existingProject, err = filehandler.FindProjectByLocalPath(localDirectory)
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error fetching new project: %w", err)
 		}
 
 	}
@@ -75,7 +87,18 @@ func GetBasicInfo(opts GetBasicInfoOptions) (projectName, localOwner, localDirec
 			return "", "", "", "", "", fmt.Errorf("error getting home directory: %w", err)
 		}
 
-		projectPath = filepath.Join(homeDirectory, "project.json")
+		existingProject, _ = filehandler.FindProjectByLocalPath(localDirectory) // Re-fetch after potential migration
+
+		version := existingProject.CurrentVersion
+		if version == 0 {
+			version = 1 // fist load will create v1
+		}
+
+		// projectPath = filepath.Join(homeDirectory, "project.json")
+		projectPath, err = filehandler.GetVersionFilePath(projectName, version)
+		if err != nil {
+			return "", "", "", "", "", fmt.Errorf("error gettting version path: %w", err)
+		}
 	}
 	return
 }

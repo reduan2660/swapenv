@@ -12,7 +12,7 @@ import (
 
 func Load(env string, replace bool) error {
 
-	projectName, localOwner, localDirectory, homeDirectory, projectPath, err := GetBasicInfo(GetBasicInfoOptions{ReadOnly: false})
+	projectName, localOwner, localDirectory, homeDirectory, _, err := GetBasicInfo(GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
 		return err
 	}
@@ -27,6 +27,16 @@ func Load(env string, replace bool) error {
 	if len(files) == 0 {
 		fmt.Print("no environment to load")
 		return nil
+	}
+
+	newVersion, err := filehandler.BumpVersion(projectName)
+	if err != nil {
+		return fmt.Errorf("error bumping version: %w", err)
+	}
+
+	versionPath, err := filehandler.GetVersionFilePath(projectName, newVersion)
+	if err != nil {
+		return fmt.Errorf("error getting version path: %w", err)
 	}
 
 	envs := map[string][]types.EnvValue{}
@@ -48,11 +58,20 @@ func Load(env string, replace bool) error {
 	}
 
 	if !replace {
-		for envName := range envs {
-			existingEnvValues, err := filehandler.ReadProjectEnv(projectPath, envName)
-			if err == nil {
-				envs[envName] = MergeEnv(envs[envName], existingEnvValues, false)
+
+		prevVersion := newVersion - 1
+		if prevVersion > 0 {
+			prevPath, _ := filehandler.GetVersionFilePath(projectName, prevVersion)
+
+			for envName := range envs {
+				existingEnvValues, err := filehandler.ReadProjectEnv(prevPath, envName)
+				if err == nil {
+					envs[envName] = MergeEnv(envs[envName], existingEnvValues, MergeEnvConfig{
+						ConflictPriority: "incoming",
+					})
+				}
 			}
+
 		}
 	}
 
@@ -63,12 +82,16 @@ func Load(env string, replace bool) error {
 		return fmt.Errorf("error generating json: %w", err)
 	}
 
-	if err := filehandler.WriteProject(homeDirectory, projectPath, projectJson); err != nil {
+	if err := filehandler.WriteProject(homeDirectory, versionPath, projectJson); err != nil {
 		return err
 	}
 
 	if err := filehandler.DeleteEnvFiles(files); err != nil {
 		return err
+	}
+
+	if err := filehandler.PruneVersions(projectName); err != nil {
+		return fmt.Errorf("error pruning versions: %w", err)
 	}
 
 	fmt.Print("loaded environment:")

@@ -9,11 +9,22 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func Set(env string, replace bool, skipCommon bool) error {
+func Set(env string, replace bool, skipCommon bool, versionStr string) error {
 
 	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
 		return err
+	}
+
+	if versionStr != "" {
+		version, err := filehandler.ResolveVersion(projectName, versionStr)
+		if err != nil {
+			return err
+		}
+		projectPath, err = filehandler.GetVersionFilePath(projectName, version)
+		if err != nil {
+			return err
+		}
 	}
 
 	incomingEnvValues, err := filehandler.ReadProjectEnv(projectPath, env)
@@ -38,8 +49,10 @@ func Set(env string, replace bool, skipCommon bool) error {
 				return commonEnvValues[i].Order < commonEnvValues[j].Order
 			})
 
-			// merge incoming with common, with priority given to incoming
-			incomingEnvValues = cmd_loader.MergeEnv(incomingEnvValues, commonEnvValues, false)
+			// merge incoming (dev) with common: dev order first, dev values win for conflicts
+			incomingEnvValues = cmd_loader.MergeEnv(commonEnvValues, incomingEnvValues, cmd_loader.MergeEnvConfig{
+				ConflictPriority: "current",
+			})
 		}
 	}
 
@@ -61,7 +74,10 @@ func Set(env string, replace bool, skipCommon bool) error {
 		return fmt.Errorf("error parsing .env: %w", err)
 	}
 
-	mergedEnv := cmd_loader.MergeEnv(incomingEnvValues, curEnvValues, replace)
+	mergedEnv := cmd_loader.MergeEnv(incomingEnvValues, curEnvValues, cmd_loader.MergeEnvConfig{
+		Replace:          replace,
+		ConflictPriority: "incoming",
+	})
 	if err := filehandler.WriteEnv(mergedEnv, envFilePath); err != nil {
 		return fmt.Errorf("error writing .env: %w", err)
 	}

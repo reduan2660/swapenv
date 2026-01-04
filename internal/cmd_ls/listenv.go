@@ -7,8 +7,8 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func ListEnv() error {
-	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
+func ListEnv(showVersions bool) error {
+	projectName, _, localDirectory, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: true})
 	if err != nil {
 		return err
 	}
@@ -26,6 +26,38 @@ func ListEnv() error {
 	fmt.Printf("available environments:")
 	for _, en := range envNames {
 		fmt.Printf(" %s", en)
+	}
+
+	if showVersions {
+		project, err := filehandler.FindProjectByLocalPath(localDirectory)
+		if err != nil {
+			return err
+		}
+
+		versions, err := filehandler.ListVersions(projectName)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("\nversions:\n")
+		for _, v := range versions {
+			marker := "  "
+			if v == project.CurrentVersion {
+				marker = "* "
+			}
+
+			name := ""
+			if n, ok := project.VersionNames[fmt.Sprintf("%d", v)]; ok {
+				name = fmt.Sprintf(" (%s)", n)
+			}
+
+			latest := ""
+			if v == project.LatestVersion {
+				latest = " [latest]"
+			}
+
+			fmt.Printf("%s%d%s%s\n", marker, v, name, latest)
+		}
 	}
 
 	return nil
