@@ -57,7 +57,7 @@ under the hood, swapenv maintains a versioning, whenever we're loading / receivi
 
 ### server
 - default: `app.swapenv.sh`
-- self-host: github.com/reduan2660/swapenv-server
+- self-host: [github.com/reduan2660/swapenv-server](github.com/reduan2660/swapenv-server)
 - override: `--server <url>` or set `server` in config
 
 ## whats coming
