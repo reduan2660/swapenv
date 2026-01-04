@@ -17,8 +17,6 @@ swap environment with breeze.
 
 e2e encyprted share and sync. the server only carries receiver's public key and encyprted payload.
 
-
-### Commands
 - `swapenv share` - share current project (all envs, latest version)
   - `--project` - specific project
   - `--env` - specific env only
