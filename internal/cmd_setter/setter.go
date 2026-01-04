@@ -9,11 +9,22 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func Set(env string, replace bool, skipCommon bool) error {
+func Set(env string, replace bool, skipCommon bool, versionStr string) error {
 
 	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
 		return err
+	}
+
+	if versionStr != "" {
+		version, err := filehandler.ResolveVersion(projectName, versionStr)
+		if err != nil {
+			return err
+		}
+		projectPath, err = filehandler.GetVersionFilePath(projectName, version)
+		if err != nil {
+			return err
+		}
 	}
 
 	incomingEnvValues, err := filehandler.ReadProjectEnv(projectPath, env)

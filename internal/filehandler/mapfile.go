@@ -97,6 +97,21 @@ func FindProjectByLocalPath(localPath string) (*types.ProjectDir, error) {
 	return nil, nil
 }
 
+func FindProjectByName(projectName string) (*types.ProjectDir, error) {
+	dirs, err := ReadProjectDirs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, dir := range dirs {
+		if dir.ProjectName == projectName {
+			return &dir, nil
+		}
+	}
+
+	return nil, nil
+}
+
 func ReadActiveEnv(localPath string) (string, error) {
 	projectDir, err := FindProjectByLocalPath(localPath)
 	if err != nil {

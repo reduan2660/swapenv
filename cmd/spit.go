@@ -17,13 +17,15 @@ var spitCmd = &cobra.Command{
 			return err
 		}
 		envName := viper.GetString("env")
-		return cmd_spit.Spit(envName)
+		version := viper.GetString("version")
+		return cmd_spit.Spit(envName, version)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(spitCmd)
 	spitCmd.Flags().String("env", "*", "to spit specific env")
+	spitCmd.Flags().String("version", "", "use specific version")
 }
 
 func GetSpitCmd() *cobra.Command {

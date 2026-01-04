@@ -48,6 +48,10 @@ func GetRootCmd() *cobra.Command {
 
 func initializeConfig(cmd *cobra.Command) error {
 
+	// defaults
+	viper.SetDefault("max_versions", 5)
+	viper.SetDefault("server", "https://app.swapenv.sh")
+
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
