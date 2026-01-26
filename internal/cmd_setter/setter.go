@@ -9,7 +9,7 @@ import (
 	"github.com/reduan2660/swapenv/internal/filehandler"
 )
 
-func Set(env string, replace bool, skipCommon bool, versionStr string) error {
+func Set(env string, replace bool, skipCommon bool, versionStr string, nowrap bool) error {
 
 	projectName, _, _, _, projectPath, err := cmd_loader.GetBasicInfo(cmd_loader.GetBasicInfoOptions{ReadOnly: false})
 	if err != nil {
@@ -78,7 +78,7 @@ func Set(env string, replace bool, skipCommon bool, versionStr string) error {
 		Replace:          replace,
 		ConflictPriority: "incoming",
 	})
-	if err := filehandler.WriteEnv(mergedEnv, envFilePath); err != nil {
+	if err := filehandler.WriteEnv(mergedEnv, envFilePath, !nowrap); err != nil {
 		return fmt.Errorf("error writing .env: %w", err)
 	}
 

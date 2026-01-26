@@ -97,7 +97,7 @@ func WriteProject(directory, filePath string, file_content []byte) error {
 	return os.WriteFile(filePath, file_content, 0644)
 }
 
-func WriteEnv(envValues []types.EnvValue, filepath string) error {
+func WriteEnv(envValues []types.EnvValue, filepath string, wrapSpecialChars bool) error {
 	var builder strings.Builder
 
 	for _, ev := range envValues {
@@ -105,7 +105,12 @@ func WriteEnv(envValues []types.EnvValue, filepath string) error {
 			builder.WriteString("\n")
 		}
 
-		builder.WriteString(fmt.Sprintf("%s=%s\n", ev.Key, ev.Val))
+		val := ev.Val
+		if wrapSpecialChars && needsQuoting(val) {
+			val = "'" + val + "'"
+		}
+
+		builder.WriteString(fmt.Sprintf("%s=%s\n", ev.Key, val))
 	}
 
 	content := builder.String()
@@ -114,7 +119,13 @@ func WriteEnv(envValues []types.EnvValue, filepath string) error {
 	}
 
 	return os.WriteFile(filepath, []byte(content), 0644)
+}
 
+// needsQuoting returns true if the value contains special characters that should be quoted
+func needsQuoting(val string) bool {
+	// Characters that have special meaning in shell and should be quoted
+	specialChars := "$`!\"\\*?^&|;()<>[]{}#~= \t\n"
+	return strings.ContainsAny(val, specialChars)
 }
 
 func DeleteEnvFiles(files []string) error {
