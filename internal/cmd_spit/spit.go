@@ -50,7 +50,7 @@ func Spit(envPattern, versionStr string) error {
 		}
 
 		outputFile := fmt.Sprintf(".%s.env", envName)
-		if err := filehandler.WriteEnv(envValues, outputFile); err != nil {
+		if err := filehandler.WriteEnv(envValues, outputFile, false); err != nil {
 			return fmt.Errorf("error writing %s: %w", outputFile, err)
 		}
 

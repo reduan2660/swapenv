@@ -21,7 +21,8 @@ var toCmd = &cobra.Command{
 		replace := viper.GetBool("replace")
 		skipCommon := viper.GetBool("skip-common")
 		version := viper.GetString("version")
-		return cmd_setter.Set(envName, replace, skipCommon, version)
+		nowrap := viper.GetBool("nowrap")
+		return cmd_setter.Set(envName, replace, skipCommon, version, nowrap)
 	},
 }
 
@@ -30,6 +31,7 @@ func init() {
 	toCmd.Flags().Bool("replace", false, "to replace the existing .env instead of overwriting")
 	toCmd.Flags().Bool("skip-common", false, "dont append common env variables (if exists)")
 	toCmd.Flags().String("version", "", "use specific version")
+	toCmd.Flags().Bool("nowrap", false, "don't wrap values with special characters in single quotes")
 }
 
 func GetToCmd() *cobra.Command {
