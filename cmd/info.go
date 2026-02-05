@@ -17,13 +17,15 @@ var infoCmd = &cobra.Command{
 			return err
 		}
 		format := viper.GetString("format")
-		return cmd_info.Info(format)
+		envOnly := viper.GetBool("env-only")
+		return cmd_info.Info(format, envOnly)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(infoCmd)
 	infoCmd.Flags().String("format", "json", "output format (json|plain)")
+	infoCmd.Flags().Bool("env-only", false, "output only the environment name (plain format)")
 }
 
 func GetInfoCmd() *cobra.Command {
