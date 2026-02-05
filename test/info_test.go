@@ -264,3 +264,71 @@ func TestInfoWithMultipleVersions(t *testing.T) {
 		t.Errorf("expected latest_version 2, got %d", info.LatestVersion)
 	}
 }
+
+func TestInfoEnvOnly(t *testing.T) {
+	cleanup := setupTestEnv(t)
+	defer cleanup()
+
+	// Load a project
+	createEnvFile(t, ".dev.env", `ENV_1=dev`)
+	loadCmd := cmd.GetLoadCmd()
+	loadCmd.Flags().Set("env", "*")
+	loadCmd.Flags().Set("replace", "false")
+	if err := loadCmd.RunE(loadCmd, []string{}); err != nil {
+		t.Fatal(err)
+	}
+
+	// Switch to dev env
+	toCmd := cmd.GetToCmd()
+	toCmd.Flags().Set("replace", "true")
+	if err := toCmd.RunE(toCmd, []string{"dev"}); err != nil {
+		t.Fatal(err)
+	}
+
+	infoCmd := cmd.GetInfoCmd()
+	infoCmd.Flags().Set("format", "plain")
+	infoCmd.Flags().Set("env-only", "true")
+
+	output, err := captureOutput(func() error {
+		return infoCmd.RunE(infoCmd, []string{})
+	})
+	if err != nil {
+		t.Fatalf("info failed: %v", err)
+	}
+
+	expected := "dev\n"
+	if output != expected {
+		t.Errorf("expected '%s', got '%s'", expected, output)
+	}
+}
+
+func TestInfoEnvOnlyNoEnv(t *testing.T) {
+	cleanup := setupTestEnv(t)
+	defer cleanup()
+
+	// Load a project but don't switch to an env
+	createEnvFile(t, ".dev.env", `ENV_1=dev`)
+	loadCmd := cmd.GetLoadCmd()
+	loadCmd.Flags().Set("env", "*")
+	loadCmd.Flags().Set("replace", "false")
+	if err := loadCmd.RunE(loadCmd, []string{}); err != nil {
+		t.Fatal(err)
+	}
+
+	infoCmd := cmd.GetInfoCmd()
+	infoCmd.Flags().Set("format", "plain")
+	infoCmd.Flags().Set("env-only", "true")
+
+	output, err := captureOutput(func() error {
+		return infoCmd.RunE(infoCmd, []string{})
+	})
+	if err != nil {
+		t.Fatalf("info failed: %v", err)
+	}
+
+	// Should output empty line when no env is set
+	expected := "\n"
+	if output != expected {
+		t.Errorf("expected '%s', got '%s'", expected, output)
+	}
+}

@@ -16,17 +16,17 @@ type ProjectInfo struct {
 	LatestVersion int      `json:"latest_version,omitempty"`
 }
 
-func Info(format string) error {
+func Info(format string, envOnly bool) error {
 	info := ProjectInfo{}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return outputInfo(info, format)
+		return outputInfo(info, format, envOnly)
 	}
 
 	project, err := filehandler.FindProjectByLocalPath(cwd)
 	if err != nil || project == nil {
-		return outputInfo(info, format)
+		return outputInfo(info, format, envOnly)
 	}
 
 	info.Project = project.ProjectName
@@ -48,12 +48,16 @@ func Info(format string) error {
 		}
 	}
 
-	return outputInfo(info, format)
+	return outputInfo(info, format, envOnly)
 }
 
-func outputInfo(info ProjectInfo, format string) error {
+func outputInfo(info ProjectInfo, format string, envOnly bool) error {
 	if format == "plain" {
 		if info.Project == "" {
+			return nil
+		}
+		if envOnly {
+			fmt.Println(info.Env)
 			return nil
 		}
 		env := info.Env
