@@ -62,14 +62,15 @@ under the hood, swapenv maintains a versioning, whenever we're loading / receivi
 Add to your config's `segments` array:
 ```json
 {
-  "type": "command",
-  "style": "plain",
-  "foreground": "#7dcfff",
-  "template": "{{ if .Output }} {{ .Output }}{{ end }}",
-  "properties": {
-    "command": "swapenv info --format plain"
-  }
+    "type": "command",
+        "style": "plain",
+        "foreground": "#7dcfff",
+        "template": "{{ if .Output }} {{ .Output }}{{ end }}",
+        "properties": {
+            "command": "swapenv info --format plain --env-only"
+        }
 }
+
 ```
 
 ### server
