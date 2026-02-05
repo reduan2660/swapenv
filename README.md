@@ -65,7 +65,7 @@ Add to your config's `segments` array:
     "type": "command",
         "style": "plain",
         "foreground": "#7dcfff",
-        "template": "{{ if .Output }} {{ .Output }}{{ end }}",
+        "template": "{{ if .Output }} {{ .Output }}{{ end }}",
         "properties": {
             "command": "swapenv info --format plain --env-only"
         }
