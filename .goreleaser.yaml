@@ -36,10 +36,10 @@ changelog:
       - "^ci:"
 
 brews:
-  - repository:
+  - directory: Formula
+    repository:
       owner: reduan2660
       name: homebrew-tap
-      directory: Formula
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     homepage: "https://github.com/reduan2660/swapenv"
     description: "Switch and sync your environment conveniently"
