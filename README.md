@@ -1,4 +1,4 @@
-# swapenv
+# <img src="docs/favicon.svg" width="24" height="24" /> swapenv
 
 swap environment with breeze.
 
@@ -57,7 +57,19 @@ under the hood, swapenv maintains a versioning, whenever we're loading / receivi
 
 ## Integrations
 
+### vscode / open vsx
+
+swap environments directly from your editor.
+
+![vscode integration](docs/integration-code.png)
+
+- [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=AlveReduan.swapenv-code)
+- [Open VSX Registry](https://open-vsx.org/extension/AlveReduan/swapenv-code)
+- [Source](https://github.com/reduan2660/swapenv-code)
+
 ### oh-my-posh
+
+![oh-my-posh integration](docs/integration-oh-my-posh.png)
 
 Add to your config's `segments` array:
 ```json
