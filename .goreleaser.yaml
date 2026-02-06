@@ -44,8 +44,3 @@ homebrew_casks:
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     homepage: "https://github.com/reduan2660/swapenv"
     description: "Switch and sync your environment conveniently"
-    license: "MIT"
-    install: |
-      bin.install "swapenv"
-    test: |
-      assert_match "swapenv", shell_output("#{bin}/swapenv --help")
