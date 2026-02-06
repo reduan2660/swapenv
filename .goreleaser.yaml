@@ -36,8 +36,7 @@ changelog:
       - "^ci:"
 
 brews:
-  - directory: Formula
-    repository:
+  - repository:
       owner: reduan2660
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
