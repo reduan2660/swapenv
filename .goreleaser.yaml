@@ -1,0 +1,50 @@
+version: 2
+
+project_name: swapenv
+
+builds:
+  - main: .
+    binary: swapenv
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+
+brews:
+  - repository:
+      owner: reduan2660
+      name: homebrew-tap
+      directory: Formula
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: "https://github.com/reduan2660/swapenv"
+    description: "Switch and sync your environment conveniently"
+    license: "MIT"
+    install: |
+      bin.install "swapenv"
+    test: |
+      assert_match "swapenv", shell_output("#{bin}/swapenv --help")
