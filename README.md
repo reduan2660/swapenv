@@ -100,6 +100,17 @@ when    = true
 format  = "[ \uf492 $output ](fg:#00d9ff bg:#2d3f76)"
 ```
 
+Also main format string configuration on starships .toml config needs to have ${custom.swapenv}.
+
+```
+format = """
+$directory\
+${custom.swapenv}\
+$git_branch\
+$prompt\
+"""
+```
+
 ###
 
 ### WARP
